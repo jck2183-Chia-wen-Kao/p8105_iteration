@@ -1,0 +1,48 @@
+---
+title: "Iteration"
+subtitle : "Function"
+output: github_document
+---
+
+```{r setup}
+library(tidyverse)
+library(rvest)
+```
+
+## Do Something Simple
+
+```{r}
+x_vec <- rnorm(30, mean = 5, sd = 3)
+
+(x_vec - mean(x_vec)) / sd(x_vec)
+```
+
+I want a function to compute Z score
+
+```{r}
+z_score <- function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Input must be numeric")
+  }
+  
+  if (length(x) <  3) {
+    stop("Input must have at least three numbers")
+  }
+  z = (x - mean(x)) / sd(x)
+  
+  
+  return(z)
+}
+
+z_score(x_vec)
+```
+Try my function on some other things. These should give error.
+
+```{r, error=TRUE}
+z_score(3)
+z_score("my name is Jeff")
+z_score(mtcars)
+z_score(c(TRUE, FALSE, TRUE, TRUE))
+```
+
