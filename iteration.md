@@ -202,3 +202,11 @@ What if you want a different function…?
 output = map(list_norm, median)
 output = map(list_norm, IQR)
 ```
+
+``` r
+output = map_dbl(list_norm, median, .id = "input")
+```
+
+``` r
+output = map_df(list_norm, mean_and_sd, .id = "input")
+```
