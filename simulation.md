@@ -133,4 +133,75 @@ sim_results %>%
   ggplot(aes(x = sd)) + geom_density()
 ```
 
-![](simulation_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+![](simulation_files/figure-gfm/unnamed-chunk-5-2.png)<!-- --> \#\#
+Let’s try other sample sizes.
+
+``` r
+n_list =
+  list(
+    "n = 30" = 30,
+    "n = 60" = 60,
+    "n = 120" = 120,
+    "n = 240" = 240
+  )
+
+output = vector("list", length = 4)
+
+output[[1]] = rerun(100, sim_mean_sd(samp_size = n_list[[1]])) %>%
+  bind_rows()
+output[[2]] = rerun(100, sim_mean_sd(samp_size = n_list[[1]])) %>%
+  bind_rows()
+
+for (i in 1:4) {
+  output[[i]] = 
+    rerun(100, sim_mean_sd(samp_size = n_list[[i]])) %>%
+    bind_rows()
+}
+```
+
+``` r
+sim_results =
+  tibble( 
+  samp_size = c(30, 60 , 120, 240)
+  ) %>% 
+  mutate(
+    output_lists = map(.x = samp_size,
+                       ~rerun(1000,sim_mean_sd(.x))), 
+    estimate_df = map(output_lists, bind_rows)
+  ) %>% 
+  select(-output_lists) %>% 
+  unnest(estimate_df)
+```
+
+Do some data frame things.
+
+``` r
+sim_results %>%
+  mutate(
+    sample_size = str_c("n = ", samp_size), 
+    sample_size = fct_inorder(sample_size)
+  ) %>% 
+  ggplot(aes(x = sample_size, y = mean)) +
+  geom_violin()
+```
+
+![](simulation_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+sim_results %>% 
+  group_by(samp_size) %>% 
+  summarise(
+    avg_samp_mean = mean(mean),
+    sd_samp_mean = sd(mean)
+  )
+```
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+    ## # A tibble: 4 x 3
+    ##   samp_size avg_samp_mean sd_samp_mean
+    ##       <dbl>         <dbl>        <dbl>
+    ## 1        30          3.00        0.711
+    ## 2        60          3.02        0.519
+    ## 3       120          2.99        0.378
+    ## 4       240          3.00        0.263
